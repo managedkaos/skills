@@ -4,4 +4,7 @@ help: ## Display available targets
 sync: ## Sync skills into all configured tool directories
 	@python3 ./_tools/sync.py
 
-.PHONY: help sync
+index: ## Update README.md with skills index
+	@python3 ./_tools/index.py
+
+.PHONY: help sync index
