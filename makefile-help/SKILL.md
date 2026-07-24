@@ -2,15 +2,10 @@
 name: makefile-help
 description: >-
   Annotate a Makefile with self-documenting help targets. Adds a `help` target
-  as the default and appends inline ## descriptions to every user-facing target.
+  as the default and appends inline descriptions to every user-facing target.
 when_to_use: >-
   annotate makefile, makefile help, document makefile, add makefile comments,
   self-documenting make targets, onboard makefile
-argument-hint: [path/to/Makefile]
-arguments: [filepath]
-allowed-tools: Read Edit
-disable-model-invocation: false
-paths: "**/*.Makefile, Makefile"
 ---
 
 # Annotate Makefile with Self-Documenting Help
