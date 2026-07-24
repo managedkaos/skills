@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Sync skills directory into AI tool locations via whole-directory symlinks."""
+"""Sync individual skills into AI tool directories via per-skill symlinks."""
 
 import os
-import shutil
 import tomllib
 from pathlib import Path
 
@@ -22,38 +21,44 @@ def load_config():
     return skills_dir, targets
 
 
-def is_safe_to_replace(target, skills_dir):
-    """Check if a real directory is safe to replace (empty or only contains our symlinks)."""
-    for entry in target.iterdir():
-        if entry.is_symlink():
-            resolved = Path(os.readlink(entry))
-            if not str(resolved).startswith(str(skills_dir)):
-                return False
-        else:
-            return False
-    return True
+def discover_skills(skills_dir):
+    skills = []
+    for skill_md in sorted(skills_dir.glob("*/SKILL.md")):
+        name = skill_md.parent.name
+        if not name.startswith(("_", ".")):
+            skills.append(name)
+    return skills
 
 
-def sync_target(skills_dir, target):
-    if target.is_symlink():
-        current = target.resolve()
-        if current == skills_dir:
-            print(f"  ok  {target} → {skills_dir}")
+def sync_target(skills_dir, target, skills):
+    target.mkdir(parents=True, exist_ok=True)
+
+    for name in skills:
+        link = target / name
+        source = skills_dir / name
+
+        if link.is_symlink():
+            current = Path(os.readlink(link))
+            if current == source:
+                print(f"  ok  {link}")
+            else:
+                link.unlink()
+                link.symlink_to(source)
+                print(f"  fix {link} (was {current})")
+        elif link.exists():
+            print(f" skip {link} (not a symlink, won't overwrite)")
         else:
-            target.unlink()
-            target.symlink_to(skills_dir)
-            print(f"  fix {target} (was → {current})")
-    elif target.is_dir():
-        if is_safe_to_replace(target, skills_dir):
-            shutil.rmtree(target)
-            target.symlink_to(skills_dir)
-            print(f"  fix {target} (replaced directory with symlink)")
-        else:
-            print(f" skip {target} (directory with non-managed content, won't overwrite)")
-    else:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.symlink_to(skills_dir)
-        print(f"  add {target} → {skills_dir}")
+            link.symlink_to(source)
+            print(f"  add {link}")
+
+    for entry in sorted(target.iterdir()):
+        if not entry.is_symlink():
+            continue
+        resolved = Path(os.readlink(entry))
+        if str(resolved).startswith(str(skills_dir)):
+            if entry.name not in skills:
+                entry.unlink()
+                print(f"  rm  {entry} (skill removed)")
 
 
 def main():
@@ -63,8 +68,13 @@ def main():
         print(f"Skills directory not found: {skills_dir}")
         return
 
+    skills = discover_skills(skills_dir)
+    if not skills:
+        print(f"No skills found in {skills_dir}")
+        return
+
     for target in targets:
-        sync_target(skills_dir, target)
+        sync_target(skills_dir, target, skills)
 
 
 if __name__ == "__main__":
