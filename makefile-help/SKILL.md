@@ -10,6 +10,7 @@ argument-hint: [path/to/Makefile]
 arguments: [filepath]
 allowed-tools: Read Edit
 disable-model-invocation: false
+paths: "**/*.Makefile, Makefile"
 ---
 
 # Annotate Makefile with Self-Documenting Help
