@@ -3,6 +3,11 @@
 skills_dir = "~/.agents/skills"
 
 [targets]
+antigravity = "~/.gemini/skills/"
 claude = "~/.claude/skills"
 codex = "~/.codex/skills"
 kiro = "~/.kiro/skills"
+
+[notes]
+copilot = "Uses `$HOME/.agents/skill` and `%USERPROFILE%.agents\\skills` natively"
+antigravity ="Uses ~/.gemini/skills/ or ~/.agents/skills/"

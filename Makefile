@@ -4,7 +4,10 @@ help: ## Display available targets
 sync: ## Sync skills into all configured tool directories
 	@python3 ./_tools/sync.py
 
+test: ## Run tests and report exit status
+	@python3 -m unittest discover -s _tools -p 'test_*.py' -v; python3 _tools/sync.py; status=$$?; printf 'exit=%s\n' "$$status"
+
 index: ## Update README.md with skills index
 	@python3 ./_tools/index.py
 
-.PHONY: help sync index
+.PHONY: help sync test index

@@ -2,12 +2,13 @@
 """Sync individual skills into AI tool directories via per-skill symlinks."""
 
 import os
+import sys
 import tomllib
 from pathlib import Path
 
 
-def load_config():
-    config_path = Path(__file__).parent / "config.toml"
+def load_config(config_path=None):
+    config_path = config_path or Path(__file__).parent / "config.toml"
     with open(config_path, "rb") as f:
         config = tomllib.load(f)
 
@@ -62,20 +63,33 @@ def sync_target(skills_dir, target, skills):
 
 
 def main():
-    skills_dir, targets = load_config()
+    config_path = Path(__file__).parent / "config.toml"
+    try:
+        skills_dir, targets = load_config(config_path)
+    except tomllib.TOMLDecodeError as error:
+        print(f"Invalid TOML in {config_path}: {error}", file=sys.stderr)
+        if "Unescaped '\\'" in str(error):
+            print(
+                "Hint: escape backslashes as '\\\\' or use a TOML literal "
+                "string enclosed in single quotes.",
+                file=sys.stderr,
+            )
+        return 2
 
     if not skills_dir.is_dir():
         print(f"Skills directory not found: {skills_dir}")
-        return
+        return 1
 
     skills = discover_skills(skills_dir)
     if not skills:
         print(f"No skills found in {skills_dir}")
-        return
+        return 1
 
     for target in targets:
         sync_target(skills_dir, target, skills)
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
