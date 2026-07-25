@@ -3,6 +3,6 @@
 skills_dir = "~/.agents/skills"
 
 [targets]
-# codex = "~/.codex/skills" # don't sync; contains skills installed by the application
 claude = "~/.claude/skills"
+codex = "~/.codex/skills"
 kiro = "~/.kiro/skills"

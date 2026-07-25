@@ -23,6 +23,7 @@ This repo contains the following skills:
 
 | Skill | Description |
 | --- | --- |
+| [hello-skill](hello-skill/) | A minimal example skill that responds with a greeting. |
 | [makefile-help](makefile-help/) | Annotate a Makefile with self-documenting help targets. Adds a `help` target as the default and appends inline descriptions to every user-facing target. |
 
 <!-- skills-index-end -->
